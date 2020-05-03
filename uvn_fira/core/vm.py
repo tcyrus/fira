@@ -37,6 +37,7 @@ from typing import Optional
 class CSNadiaVMCommandNotFoundError(Exception):
     """VM command not found."""
 
+
 class CSNadiaVM(object):
     """An implementation of the NadiaVM stack."""
 
@@ -99,7 +100,7 @@ class CSNadiaVM(object):
         elif current[0] == "collect":
             pass
         elif current[0] != "exit":
-            raise CSNadiaVMCommandNotFoundError("Invalid command: '%s'" % (current[0]))
+            raise CSNadiaVMCommandNotFoundError("Invalid command: '{}'".format(current[0]))
 
     def _alloc(self, name, size):
         """Allocate a space of memory for a given array.
@@ -165,8 +166,8 @@ class CSNadiaVM(object):
         Returns:
             array (list): The specified item, or None if it doesn't exist.
         """
-        return self.__dict__[name] if name in self.__dict__ \
-            and type(self.__dict__[name]) is list else None #pylint:disable=unidiomatic-typecheck
+        item = self.__dict__.get(name)
+        return item if isinstance(item, list) else None #pylint:disable=unidiomatic-typecheck
 
     def pos(self):
         # type: (CSNadiaVM) -> tuple[int, int]
@@ -201,9 +202,9 @@ class CSNadiaVMWriterBuilder(object):
         self.path = path
 
     def __str__(self):
-        string = "Filepath: %s\n" % (self.path)
+        string = "Filepath: {}\n".format(self.path)
         for instruction in self.instructions:
-            string += "%s\n" % (instruction)
+            string += "{}\n".format(instruction)
         return string
 
     def alloc(self, array_name, size=1):
@@ -214,7 +215,7 @@ class CSNadiaVMWriterBuilder(object):
             array_name (str): The name of the array to allocate space for.
             size (int): The size of the array. Defaults to 1.
         """
-        self.instructions.append("alloc %s %s\n" % (array_name, size))
+        self.instructions.append("alloc {} {}\n".format(array_name, size))
 
     def push(self, array, index):
         # type: (CSNadiaVMWriterBuilder, str, int) -> None
@@ -224,7 +225,7 @@ class CSNadiaVMWriterBuilder(object):
             array (str): The name of the array to push to.
             index (int): The index of the array to push to.
         """
-        self.instructions.append("push %s %s\n" % (array, index))
+        self.instructions.append("push {} {}\n".format(array, index))
 
     def pop(self, array, index):
         # type: (CSNadiaVMWriterBuilder, str, int) -> None
@@ -235,7 +236,7 @@ class CSNadiaVMWriterBuilder(object):
             array (str): The array to pop an item from.
             index (int): The index of the item in the array to pop.
         """
-        self.instructions.append("pop %s %s\n" % (array, index))
+        self.instructions.append("pop {} {}\n".format(array, index))
 
     def set(self, value):
         # type: (CSNadiaVMWriterBuilder, any) -> None
@@ -244,7 +245,7 @@ class CSNadiaVMWriterBuilder(object):
         Arguments:
             value (any): The value to create a constant for.
         """
-        self.instructions.append("set constant " + str(value) + "\n")
+        self.instructions.append("set constant {0!s}\n".format(value))
 
     def move(self, direction):
         # type: (CSNadiaVMWriterBuilder, str) -> None
@@ -253,7 +254,7 @@ class CSNadiaVMWriterBuilder(object):
         Arguments:
             direction (str): The direction the player will move in.
         """
-        self.instructions.append("move player " + direction + "\n")
+        self.instructions.append("move player {}\n".format(direction))
 
     def collect(self):
         # type: (CSNadiaVMWriterBuilder) -> None
@@ -306,7 +307,7 @@ class CSNadiaVMWriter(object):
         self.path = path
 
     def __str__(self):
-        return "Filepath: " + self.path + "\n" + self.code
+        return "Filepath: {}\n{}".format(self.path, self.code)
 
     def alloc(self, array_name, size=1):
         # type: (CSNadiaVMWriter, str, int) -> None
@@ -316,7 +317,7 @@ class CSNadiaVMWriter(object):
             array_name (str): The name of the array to allocate space for.
             size (int): The size of the array. Defaults to 1.
         """
-        self.code += "alloc %s %s\n" % (array_name, size)
+        self.code += "alloc {} {}\n".format(array_name, size)
 
     def push(self, array, index):
         # type: (CSNadiaVMWriter, str, int) -> None
@@ -326,7 +327,7 @@ class CSNadiaVMWriter(object):
             array (str): The name of the array to push to.
             index (int): The index of the array to push to.
         """
-        self.code += "push %s %s\n" % (array, index)
+        self.code += "push {} {}\n".format(array, index)
 
     def pop(self, array, index):
         # type: (CSNadiaVMWriter, str, int) -> None
@@ -337,7 +338,7 @@ class CSNadiaVMWriter(object):
             array (str): The array to pop an item from.
             index (int): The index of the item in the array to pop.
         """
-        self.code += "pop %s %s\n" % (array, index)
+        self.code += "pop {} {}\n".format(array, index)
 
     def set(self, value):
         # type: (CSNadiaVMWriter, any) -> None
@@ -346,7 +347,7 @@ class CSNadiaVMWriter(object):
         Arguments:
             value (any): The value to create a constant for.
         """
-        self.code += "set constant " + str(value) + "\n"
+        self.code += "set constant {0!s}\n".format(value)
 
     def move(self, direction):
         # type: (CSNadiaVMWriter, str) -> None
@@ -355,7 +356,7 @@ class CSNadiaVMWriter(object):
         Arguments:
             direction (str): The direction the player will move in.
         """
-        self.code += "move player " + direction + "\n"
+        self.code += "move player {}\n".format(direction)
 
     def collect(self):
         # type: (CSNadiaVMWriter) -> None
